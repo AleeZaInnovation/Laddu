@@ -16,4 +16,11 @@ class Product extends Model
     public function category(){
         return $this->belongsTo('App\Models\Category','category_id');
     }
+
+    public function attrubutes(){
+        return $this->hasMany('App\Models\ProductAttribute');
+    }
+    public function images(){
+        return $this->hasMany('App\Models\ProductImage');
+    }
 }

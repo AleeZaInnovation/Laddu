@@ -9,6 +9,7 @@ use App\Models\Section;
 use App\Models\Brand;
 use App\Models\Admin;
 use App\Models\CAtegory;
+use App\Models\ProductAttribute;
 use Session;
 use Auth;
 use Image;
@@ -17,8 +18,7 @@ class ProductController extends Controller
 {
     //
 
-    public function products()
-    {
+    public function products(){
         //
         Session::put('page','products');
         $products = Product::with(['section'=>function($query){
@@ -222,20 +222,98 @@ class ProductController extends Controller
     }
 
     public function addProductAttribute(Request $request, $id){
+        Session::put('page','products');
         //echo "<pre>"; print_r("hello"); die;        
-        $product = Product::find($id);
-        //dd($product);
+        $product = Product::select('id','product_name','product_code','product_color','product_price','product_image')->with('attrubutes')->find($id);
+        // $product = json_decode(json_encode($product),true);
+        // dd($product);
 
         if($request->isMethod('post')){
             $data = $request->all();
             //dd($data);
-           echo "<pre>"; print_r($data); die;
+           //echo "<pre>"; print_r($data); die;
+
+           foreach ($data['sku'] as $key => $value){
+             if(!empty($value)){
+                $skuCount = ProductAttribute::where('sku',$value)->count();
+                if($skuCount>0){
+                    return redirect()->back()->with('error_message','Sku already exist , please add another Sku');
+                }
+                $sizeCount = ProductAttribute::where('size',$data['size'][$key])->count();
+                if($sizeCount>0){
+                    return redirect()->back()->with('error_message','Size already exist , please add another size');
+                }
+                $sttribute = new ProductAttribute;
+                $sttribute->product_id = $id;
+                $sttribute->sku = $value;
+                $sttribute->size = $data['size'][$key] ;
+                $sttribute->price = $data['price'][$key];
+                $sttribute->stock = $data['stock'][$key];
+                $sttribute->status = 1;
+                $sttribute->save();
+             }
+           }
+
+           return redirect()->back()->with('success_message','Prtoduct attribute has been added successfully!');
 
         }
 
-        return view('admin.attributes.add_edit_attributes')->with(compact('product'));
+        return view('admin.attributes.add_edit_attributes')->with(compact('product')); 
 
-  
+    }
+
+    public function updateAttributeStatus(Request $request){
+        if($request->ajax()){
+            $data = $request->all();
+            //echo "<pre>"; print_r($data); die;
+            if($data['status']=="Active"){
+                $status = 0;
+            }else{
+                $status = 1;
+            }
+
+            ProductAttribute::where('id',$data['item_id'])->update(['status'=>$status]);
+
+            return response()->json(['status'=>$status,'item_id'=>$data['item_id']]);
+        }
+    }
+
+    public function editProductAttribute(Request $request){
+        Session::put('page','products');
+        if($request->isMethod('post')){
+            $data = $request->all();
+            //dd($data);
+
+            foreach ($data['attributeID'] as $key => $value){
+                //dd($data['attributeID']);
+                if(!empty($value)){
+                   ProductAttribute::where(['id'=>$data['attributeID'][$key]])->update(['price'=>$data['price'][$key],'stock'=>$data['stock'][$key]]);
+                   
+                }
+              }
+              return redirect()->back()->with('success_message','Prtoduct attribute has been updated successfully!');
+   
+        
+        }
+
+    }
+
+    public function addImages(Request $request, $id){
+        Session::put('page','products');
+        //echo "<pre>"; print_r("hello"); die;        
+        $product = Product::select('id','product_name','product_code','product_color','product_price','product_image')->with('images')->find($id);
+        // $product = json_decode(json_encode($product),true);
+        // dd($product);
+
+        if($request->isMethod('post')){
+            $data = $request->all();
+            if($request->hasFile('images')){
+                $images = $request->file('images');
+                echo "<pre>"; print_r($images); die;
+            }
+        }
+
+        return view('admin.images.add_images')->with(compact('product')); 
 
     }
 }

@@ -107,13 +107,14 @@
                                         </td>
                                             
                                         <td>
-                                            <a href="{{ url('admin/add-edit-product/'.$item['id'] )}}">
+                                            <a title="Edit Product" href="{{ url('admin/add-edit-product/'.$item['id'] )}}">
                                             <i style="font-size:25px;" class="mdi mdi-pencil-box"></i></a>
-                                            <a href="{{ url('admin/add-attributes/'.$item['id'] )}}">
+                                            <a title="Add Attributes" href="{{ url('admin/add-attributes/'.$item['id'] )}}">
                                             <i style="font-size:25px;" class="mdi mdi-plus-box"></i></a>
-                                            <?php /* <a title="section" class="confirmDelete" href="{{ url('admin/delete-section/'.$item['id'] )}}">
-                                            <i style="font-size:25px;" class="mdi mdi-file-excel-box"></i></a> */ ?>
-                                            <a class="confirmDelete" href="javascript:void(0)" module="product" moduleid="{{ $item['id']}}">
+                                            <a title="Add Multiple Images" href="{{ url('admin/add-images/'.$item['id'] )}}">
+                                            <i style="font-size:25px;" class="mdi mdi-library-plus"></i></a>
+                                            <!--  -->
+                                            <a title="Delete" class="confirmDelete" href="javascript:void(0)" module="product" moduleid="{{ $item['id']}}">
                                             <i style="font-size:25px;" class="mdi mdi-file-excel-box"></i></a>
                                         </td>
                                     </tr>

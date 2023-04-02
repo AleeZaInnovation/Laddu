@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Category;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,13 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';
 
@@ -123,5 +124,26 @@ Route::prefix('/admin')->namespace('App\Http\Controllers\Admin')->group(function
 
         
     });
+});
+
+Route::namespace('App\Http\Controllers\Front')->group(function(){
+    Route::get('/','IndexController@Index');
+    // Category Listing
+
+    $catUrls = Category::select('url')->where('status',1)->get()->pluck('url')->toArray(); 
+    // dd($catUrls); die();
+
+    foreach( $catUrls as $key=>$url){
+        Route::match(['get','post'],'/'.$url,'ProductController@listing');
+    }
+
+    //Vendor login and registration
+
+    Route::get('vendor/login-registration/','VendorController@loginRegistration');
+
+    //Vendor egistration
+
+    Route::post('vendor/register/','VendorController@vendorRegistration');
+    Route::get('vendor/confirm/{code}','VendorController@confirmVendor');
 });
 
